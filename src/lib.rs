@@ -11,13 +11,44 @@
 mod parse;
 use wasm_bindgen::prelude::*;
 
+use std::sync::{Mutex, OnceLock};
+
+static ROOT: OnceLock<Mutex<Box<parse::Node>>> = OnceLock::new(); //thread safety black magic
+
 #[wasm_bindgen]
 pub fn generate_tree(input: String) -> String 
 {
     let tokens = parse::tokenize(input).expect("Parsing failed");
     let p_tokens = parse::parenthise(tokens).unwrap();
     let t_tokens = parse::treeify(p_tokens).expect("Failed to form tree");
-    t_tokens.to_string()
+    ROOT.get_or_init(|| Mutex::new(t_tokens.clone()));
+    let root = ROOT.get().unwrap();
+    let mut node = root.lock().unwrap();
+    *node = t_tokens;
+    (*node).to_string()
+}
+
+#[wasm_bindgen]
+pub fn beta_reduce_once() -> String
+{
+    let root = ROOT.get().unwrap();
+    let mut node = root.lock().unwrap();
+    parse::beta_reduce_once(&mut node);
+    (*node).to_string()
+}
+
+#[wasm_bindgen]
+pub fn get_token_rep() -> String
+{
+    let root = ROOT.get().unwrap();
+    let node = root.lock().unwrap();
+    let tokens = parse::detree(node.as_ref());
+    let mut s = "".to_string();
+    for token in tokens.iter()
+    {
+        s.push_str(&token.to_string());
+    }
+    s
 }
 
 

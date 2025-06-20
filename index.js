@@ -1,8 +1,35 @@
-import init, {generate_tree} from "/pkg/LambdaCalculusInterpreter.js";
+import init, {generate_tree, beta_reduce_once, get_token_rep} from "/pkg/LambdaCalculusInterpreter.js";
+
+
+async function beta_reduce() {
+    await init();
+    draw_graph(beta_reduce_once());
+    token_rep();
+}
+
+function token_rep() {
+    var output = document.getElementById("output");
+    output.value += get_token_rep() + "\n";
+}
 
 async function parse() {
     await init();
     var code = document.getElementById("input").value;
+    var output = document.getElementById("output");
+    output.value = "";
+    draw_graph(generate_tree(code));
+    token_rep();
+}
+
+function draw_graph(tree_data) 
+{
+    am5.array.each(am5.registry.rootElements,
+        function (root) {
+            if (root.dom.id == "chartdiv") {
+                root.dispose();
+            }
+        }
+    );
 
     am5.ready(function () {
 
@@ -44,15 +71,16 @@ async function parse() {
 
         series.labels.template.set("minScale", 0);
 
-        var data = JSON.parse(generate_tree(code));
+        var data = JSON.parse(tree_data);
 
         series.data.setAll([data]);
         series.set("selectedDataItem", series.dataItems[0]);
         series.appear(1000, 100);
 
+        return () => {root.dispose();}
     }); // end am5.ready()
-
 }
 
 
 document.getElementById("Parse").addEventListener("click", parse);
+document.getElementById("beta-reduce").addEventListener("click", beta_reduce);

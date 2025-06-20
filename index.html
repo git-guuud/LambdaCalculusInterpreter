@@ -11,10 +11,16 @@
     <script src="https://cdn.amcharts.com/lib/5/hierarchy.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
     
-    <textarea name="input" id="input"></textarea>
-    <textarea name="output" id = "output"></textarea>
-    <button id="Parse">Parse</button>
-    <div id="chartdiv" style="width: 50%; height: 90vh;"></div>
+    <div style="display: flex; flex-direction: row;">
+        <div style="width:40%">
+            <textarea name="input" id="input" style="width: 100%; height: 20vh;"></textarea>
+            <textarea name="output" id = "output" style="width: 100%; height: 60vh;"></textarea>
+            <button id="Parse">Parse</button>
+            <button id="beta-reduce">Beta Reduce</button>
+        </div>
+        
+        <div id="chartdiv" style="width: 50%; height: 90vh; align-self: center;"></div>
+    </div>
     
     <script type="module" src="./index.js"></script>
 </body>
