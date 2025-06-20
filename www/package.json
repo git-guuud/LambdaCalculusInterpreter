@@ -1,16 +1,5 @@
 {
-  "name": "lambda-calculus",
-  "version": "1.0.0",
-  "description": "",
-  "license": "ISC",
-  "author": "Shivam Maurya",
-  "type": "commonjs",
-  "main": "index.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-
   "dependencies": {
-    "lambda-calculus-interpreter": "file:../pkg"
+    "LambdaCalculusInterpreter": "file:../pkg"
   }
 }
