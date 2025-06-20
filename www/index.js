@@ -1,4 +1,4 @@
-import init, {generate_tree, beta_reduce_once, get_token_rep} from "lambda-calculus-interpreter";
+import init, {generate_tree, beta_reduce_once, get_token_rep} from "/pkg/LambdaCalculusInterpreter.js";
 
 
 async function beta_reduce() {
