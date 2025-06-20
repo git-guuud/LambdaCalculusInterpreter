@@ -1,4 +1,4 @@
-use std::fs;
+// use std::fs;
 use std::fmt;
 use std::vec::Vec;
 
@@ -39,23 +39,28 @@ impl fmt::Display for Node
 {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result 
     {
-        let mut s = "".to_string();
-        s = format!("{}\n{}", s, self.token);
-        for token in &self.children 
+        let mut s = "{".to_string();
+
+        s = format!("{}\"name\":\"{}\", \"children\":[", s, self.token);
+        if self.children.len() > 0 
         {
-            s = format!("{}    {}", s, token);
+            for child in &self.children 
+            {
+                s = format!("{}{},", s, child);
+            }
+            s.pop();
         }
-        write!(f,"{}",s)
+        write!(f,"{}]}}",s)
     }
 }
 
 
-pub fn tokenize(path: &str) -> Result<Vec<Token>, String>
+pub fn tokenize(contents: String) -> Result<Vec<Token>, String>
 {
     // This function will parse the input string and return an Expr
     // For now, we will return an error to indicate that this is not implemented
     
-    let contents = fs::read_to_string(path).expect("File no readable");
+    
     let mut tokens = Vec::new();
 
     let mut current_token = String::new();
