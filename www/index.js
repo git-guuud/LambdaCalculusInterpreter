@@ -1,8 +1,8 @@
-import init, {generate_tree, beta_reduce_once, get_token_rep} from "./node_modules/lambda-calculus-interpreter/LambdaCalculusInterpreter.js";
+import initSync, {generate_tree, beta_reduce_once, get_token_rep} from "./LambdaCalculusInterpreter.js";
 
 
 async function beta_reduce() {
-    await init();
+    await initSync();
     draw_graph(beta_reduce_once());
     token_rep();
 }
@@ -13,7 +13,7 @@ function token_rep() {
 }
 
 async function parse() {
-    await init();
+    await initSync();
     var code = document.getElementById("input").value;
     var output = document.getElementById("output");
     output.value = "";
