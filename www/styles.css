@@ -1,0 +1,133 @@
+#input ,#output
+{
+    width: 90%;
+    height: 40%;
+    margin: 3% 5%;
+    resize: none;
+    font-size: 20px;
+    color: #FBF5F3;
+    background-color: #26292C;
+    border: none;
+    text-wrap: nowrap;
+    padding-left: 5px;
+    padding-top: 5px;
+    border-radius: 10px;
+}
+
+#input:focus, #output:focus
+{
+    outline: 2px solid #508484;
+}
+
+
+#Parse, #beta-reduce, #solve
+{
+    width: 100%;
+    height: 8%;
+    margin: 1% 5%;
+    font-size: 30px;
+    background-color: #508484;
+    color: #FBF5F3;
+    border:none;
+    border-radius: 20px;
+    font-family: 'Courier New', Courier, monospace;
+}
+
+#Parse:hover, #beta-reduce:hover, #solve:hover
+{
+    background-color: #3A6B6B;
+}
+
+#left
+{
+    width: 48%;
+    margin: 1% 1%;
+    background-color: #4D5359;
+    border-radius: 20px;
+}
+
+#right
+{
+    width: 48%;
+    margin: 1% 1%;
+    background-color: #26292C;
+    border-radius: 20px;
+    border-style: solid;
+    border-color: #4D5359;
+    border-width: 5px;
+}
+
+#full
+{
+    display: flex; 
+    flex-direction: row; 
+    background-color: #957584; 
+    height:100dvh; 
+    width:100dvw;
+    margin: 0 0;
+    padding: 0%;
+}
+
+#help-overlay
+{
+    position: absolute;
+    z-index: 2;
+    width: 50%;
+    height: 70%;
+    top: 0;
+    left: 0;
+    bottom: 0;
+    right: 0;
+    margin: auto;
+    padding: 10px;
+    background-color: #26292C;
+    border-color: #4D5359;
+    border-width: 5px;
+    border-style: solid;
+    border-radius: 20px;
+    transition: opacity ease-in 0.3s;
+    color: #FBF5F3;
+    font-size: 20px;
+    font-family: 'Gill Sans', 'Gill Sans MT', Calibri, 'Trebuchet MS', sans-serif;
+    overflow: scroll;
+    /* cursor: pointer; */
+}
+
+#help-button
+{
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    width: 50px;
+    height: 50px;
+    background-color: #508484;
+    color: #FBF5F3;
+    border-width: 3px;
+    border-style: solid;
+    border-color: #FBF5F3;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#close-help
+{
+    position: fixed;
+    top: 15%;
+    right: 25%;
+    width: 50px;
+    height: 50px;
+    background-color: #508484;
+    color: #FBF5F3;
+    border-width: 3px;
+    border-style: solid;
+    border-color: #FBF5F3;
+    border-radius: 50%;
+    font-size: 24px;
+    cursor: pointer;
+}
+
+#close-help:hover, #help-button:hover
+{
+    background-color: #3A6B6B;
+}

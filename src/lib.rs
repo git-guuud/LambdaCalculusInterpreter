@@ -18,9 +18,25 @@ static ROOT: OnceLock<Mutex<Box<parse::Node>>> = OnceLock::new(); //thread safet
 #[wasm_bindgen]
 pub fn generate_tree(input: String) -> String 
 {
-    let tokens = parse::tokenize(input).expect("Parsing failed");
-    let p_tokens = parse::parenthise(tokens).unwrap();
-    let t_tokens = parse::treeify(p_tokens).expect("Failed to form tree");
+    let tokens = match parse::tokenize(input)
+    {
+        Ok(tokens) => tokens,
+        Err(e) => {
+            return format!("Error parsing input: {}", e);
+        }
+    };
+    let p_tokens = match parse::parenthise(tokens){
+        Ok(p_tokens) => p_tokens,
+        Err(e) => {
+            return format!("Error parsing input: {}", e);
+        }
+    };
+    let t_tokens = match parse::treeify(p_tokens) {
+        Ok(t_tokens) => t_tokens,
+        Err(e) => {
+            return format!("Error parsing input: {}", e);
+        }
+    };
     ROOT.get_or_init(|| Mutex::new(t_tokens.clone()));
     let root = ROOT.get().unwrap();
     let mut node = root.lock().unwrap();
@@ -47,10 +63,22 @@ pub fn get_token_rep() -> String
     for token in tokens.iter()
     {
         s.push_str(&token.to_string());
+        match token {
+            parse::Token::Dot | parse::Token::Variable(_) => {
+                s.push(' ');
+            },
+            _ => {}
+        }
     }
     s
 }
 
+// fn main()
+// {
+//     generate_tree("f (\\x.\\y.x) (\\x.\\y.\\z.\\t.(x (y z) t)) x (\\f.\\x.f x) (\\f.\\x.f (f x))".to_string());
+//     println!("{}", get_token_rep());
+//     beta_reduce_once();
+// }
 
 // use rocket::Rocket;
 // use std::fs::OpenOptions;

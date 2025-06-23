@@ -1,10 +1,32 @@
 import initSync, {generate_tree, beta_reduce_once, get_token_rep} from "./LambdaCalculusInterpreter.js";
 
-
+var parsed = false;
 async function beta_reduce() {
     await initSync();
+    if (!parsed) {
+        alert("Please parse the input first.");
+        return;
+    }
     draw_graph(beta_reduce_once());
     token_rep();
+}
+
+async function solve() 
+{
+    await initSync();
+    if (!parsed) {
+        alert("Please parse the input first.");
+        return;
+    }
+    var exp = get_token_rep();
+    var t = "";
+    do
+    {
+        exp = get_token_rep();
+        beta_reduce_once();
+        token_rep();
+    } while (exp != get_token_rep());
+    draw_graph(beta_reduce_once());
 }
 
 function token_rep() {
@@ -14,11 +36,26 @@ function token_rep() {
 
 async function parse() {
     await initSync();
+    parsed = true;
     var code = document.getElementById("input").value;
     var output = document.getElementById("output");
     output.value = "";
-    draw_graph(generate_tree(code));
-    token_rep();
+    try 
+    {
+        var data = generate_tree(code);
+    }
+    catch (e) 
+    {
+        alert("Unknown error: " + e.message);
+        return;
+    }
+    if (data == "Error parsing input") {
+        alert("Error while parsing, please check your input.");
+    }
+    else {
+        draw_graph(data);
+        token_rep();
+    }
 }
 
 function draw_graph(tree_data) 
@@ -41,9 +78,9 @@ function draw_graph(tree_data)
 
         // Set themes
         // https://www.amcharts.com/docs/v5/concepts/themes/
-        root.setThemes([
-            am5themes_Animated.new(root)
-        ]);
+        // root.setThemes([
+        //     am5themes_Animated.new(root)
+        // ]);
 
 
         var zoomableContainer = root.container.children.push(
@@ -75,6 +112,7 @@ function draw_graph(tree_data)
 
         series.data.setAll([data]);
         series.set("selectedDataItem", series.dataItems[0]);
+        // series.get("colors").setAll({colors:[am5.color(0x508484)]});
         series.appear(1000, 100);
 
         return () => {root.dispose();}
@@ -84,3 +122,14 @@ function draw_graph(tree_data)
 
 document.getElementById("Parse").addEventListener("click", parse);
 document.getElementById("beta-reduce").addEventListener("click", beta_reduce);
+document.getElementById("solve").addEventListener("click", solve);
+
+
+document.getElementById("help-button").addEventListener("click", function() {
+    document.getElementById("help-overlay").style.display = "initial";
+    document.getElementById("help-overlay").style.opacity = 1;
+});
+document.getElementById("close-help").addEventListener("click", function() {
+    document.getElementById("help-overlay").style.opacity = 0;
+    document.getElementById("help-overlay").style.display = "none";
+});

@@ -6,19 +6,102 @@
     <script src="https://cdn.amcharts.com/lib/5/index.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/hierarchy.js"></script>
     <script src="https://cdn.amcharts.com/lib/5/themes/Animated.js"></script>
+    <link rel="stylesheet" href="styles.css">
 </head>
-<body>
-    
-    <div style="display: flex; flex-direction: row;">
-        <div style="width:40%">
-            <textarea name="input" id="input" style="width: 100%; height: 20vh;"></textarea>
-            <textarea name="output" id = "output" style="width: 100%; height: 60vh;"></textarea>
-            <button id="Parse">Parse</button>
-            <button id="beta-reduce">Beta Reduce</button>
+<body id="full">
+    <div id="left">
+        <textarea name="input" id="input"></textarea>
+        <textarea disabled name="output" id = "output"></textarea>
+        <div style="display: flex; flex-direction: row;">
+            <button id="Parse">parse</button>
+            <button id="beta-reduce">β-reduce</button>
+            <button id="solve">solve</button>
         </div>
-        
-        <div id="chartdiv" style="width: 50%; height: 90vh; align-self: center;"></div>
     </div>
     
+    <div id="right">
+        <div id="chartdiv" style="width: 90%; height: 90%; margin: 5%;"></div>
+    </div>
+
+    <div id="help-overlay">
+        How to use? <br>
+        Enter a lambda calculus expression in the left text area, and click "parse".<br>
+        The expression will be parsed and displayed as a tree on the right side.<br>
+        You can then click "β-reduce" to reduce the expression step by step.<br>
+        Or click "solve" to reduce the expression to its normal form.<br>
+        <br>
+        What is lambda calculus? <br>
+        <br>
+        Lambda calculus is a model of computation that uses function abstraction and application,
+        It has the following rules: <br>
+        <dl>
+            1. (function definition) λx.M is a function which takes an argument x and returns M. <br>
+            2. (β-reduction) f y applies the function f to y replacing all occurences of x in M with y. <br>
+        </dl>
+        <strong>That's it!!</strong><br>
+        <br>
+        Surprisingly, Just these two rules are enough to express any computable function. <br>
+        <br>
+        One can begin to use abstraction to define usual functions. <br>
+        For example, if you define the natural numbers as follows (church numerals): <br>
+        <dl>
+            0 = λf.λx.x <br>
+            1 = λf.λx.f x <br>
+            2 = λf.λx.f (f x) <br>
+            3 = λf.λx.f (f (f x)) <br>
+            ... <br>
+        </dl>
+        Then you can define addition as: add = λm.λn.λf.λx.m f (n f x) <br>
+        multiplication as: mult = λm.λn.λf.m (n f) <br>
+        exponentiation as: exp = λm.λn.n m <br>
+        <br>
+        Similarly, if you define booleans as: <br>
+        <dl>
+            true = λx.λy.x <br>
+            false = λx.λy.y <br>
+        </dl>
+        Then you can define logical operations as: <br>
+        <dl>
+            and = λp.λq.((p q) p) <br>
+            or = λp.λq.((a b) a) <br>
+            not = λp.((p false) true) <br>
+            ifthenelse = λp.λa.λb.p a b <br>
+        </dl>
+        <br>
+        You can also emulate data structures like lists, pairs, and trees. <br>
+        For example, a pair can be defined as: <br>
+        <dl>
+            pair = λx.λy.λf.f x y <br>
+            first = λp.p (λx.λy.x) <br>
+            second = λp.p (λx.λy.y) <br>
+        </dl>
+        <br>
+        Anything computable can be expressed in lambda calculus! <br>
+        <br>
+        Here are some examples to try: <br>
+        <dl>
+            4+5 = add 4 5 = (\m.\n.\f.\x.m f (n f x)) (\f.\x.f (f (f (f x)))) (\f.\x.f (f (f (f (f x)))))<br>
+            3*3 = mult 3 3 = (\m.\n.\f.m (n f)) (\f.\x.f (f (f x))) (\f.\x.f (f (f x)))<br>
+            2^2 = exp 2 2 = (\m.\n.n m) (\f.\x.f (f x)) (\f1.\x1.f1 (f1 x1))<br>
+            true and false = and true false = (\p.\q.p q (\x1.\y1.y1)) (\x.\y.x) (\x.\y.y)<br>
+            if true then 1 else 0 = ifthenelse true 1 0 = (\p.\a.\b.p a b) (\x.\y.x) (\f.\x0.f x0) (\f1.\x1.x1)<br>
+            second pair(1 2) = ((\p. (p (\t. (\f. f)))) (((\x. (\y. (\f0. ((f0 x) y)))) (\f1. (\x1. (f1 x1)))) (\f2. (\x2. (f2 (f2 x2))))))<br>
+        </dl>
+        <br>
+        <strong>Note:</strong><br>
+        <p style="font-size:28px; color: red">
+            <strong>This interpreter does NOT perform α-reductions so try not to reuse variable names</strong>
+        </p>
+        <br>
+        side note: The graph sadly breaks for even slightly large input,
+        as the graph library used is not designed for large trees. ;(<br>
+        <br>
+
+        Here's an awesome video if you wanna learn more about lambda calculus ;) <br>
+        <br>
+        <iframe width="560" height="315" src="https://www.youtube.com/embed/RcVA8Nj6HEo?si=6tUr_B5sLuWWjly8" title="YouTube video player" frameborder="0" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe>
+        <button id="close-help">✖</button>
+    </div>
+    <button id="help-button">?</button>
 </body>
 </html>

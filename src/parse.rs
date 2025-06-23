@@ -27,7 +27,7 @@ impl fmt::Display for Token
     }
 }
 
-#[derive(Clone)]
+#[derive(Clone, PartialEq)]
 pub struct Node
 {
     pub token: Token,
@@ -187,6 +187,10 @@ pub fn parenthise(tokens: Vec<Token>) -> Result<Vec<Token>, String>
 pub fn treeify(tokens: Vec<Token>) -> Result<Box<Node>, String>
 {
     let mut n = tokens.len();
+    if n == 0 
+    {
+        return Err("No tokens to parse.".to_string());
+    }
     let mut i = 0;
     if tokens[i] == Token::OpenParen && tokens[n-1] == Token::CloseParen 
     {
@@ -291,8 +295,14 @@ pub fn treeify(tokens: Vec<Token>) -> Result<Box<Node>, String>
             }
         }
 
-        root.children.push(treeify(var).unwrap());
-        root.children.push(treeify(body).unwrap());
+        root.children.push(match treeify(var) {
+            Ok(node) => node,
+            Err(e) => return Err(e),
+        });
+        root.children.push(match treeify(body) {
+            Ok(node) => node,
+            Err(e) => return Err(e),
+        });
     }
     else if tokens[i] == Token::OpenParen 
     {
@@ -319,7 +329,10 @@ pub fn treeify(tokens: Vec<Token>) -> Result<Box<Node>, String>
             }
         }
 
-        root.children.push(treeify(func).unwrap());
+        root.children.push(match treeify(func) {
+            Ok(node) => node,
+            Err(e) => return Err(e),
+        });
     }
     let mut num_paren = 0;
     if i==n {return Ok(root)}
@@ -347,7 +360,10 @@ pub fn treeify(tokens: Vec<Token>) -> Result<Box<Node>, String>
             }
         }
 
-        root.children.push(treeify(arg).unwrap());
+        root.children.push(match treeify(arg) {
+            Ok(node) => node,
+            Err(e) => return Err(e),
+        });
         if i==n {break 'args;}
     }
     
@@ -388,17 +404,46 @@ pub fn detree(root: &Node) -> Vec<Token>
     return output;
 }
 
-pub fn beta_reduce_once(root: &mut Node) -> () 
+pub fn beta_reduce_once(root: &mut Node) -> Result<(), ()>
 {
+    match root.token 
+    {
+        Token::Variable(_) => return Err(()),
+        Token::Lambda => {
+            return beta_reduce_once(root.children[1].as_mut());
+        },
+        _ => {}
+    };
+    if root.children.len() == 1 && root.token == Token::OpenParen
+    {
+        match beta_reduce_once(root.children[0].as_mut())
+        {
+            Ok(_) => return Ok(()),
+            Err(_) => {
+                root.token = root.children[0].token.clone();
+                root.children = root.children[0].children.clone();
+                return Ok(());
+            }
+        };
+        
+    }
     let mut lambda_found = false;
     for i in 0..root.children.len()-1
     {
         if root.children[i].token == Token::Lambda
         {
             lambda_found = true;
-            let mut body = root.children[i].children.remove(1);
-            replace(root.children[i].children[0].token.clone(), root.children.remove(i+1), body.as_mut());
-            root.children[i] = body;
+            if beta_reduce_once(root.children[i].children[1].as_mut()).is_err()
+            {
+                let mut body = root.children[i].children.remove(1);
+                replace(root.children[i].children[0].clone(), root.children.remove(i+1), body.as_mut());
+                root.children[i] = body;
+            }
+            return Ok(());
+        }
+        else if root.children[i].token == Token::OpenParen 
+        {
+            return beta_reduce_once(root.children[i].as_mut());
         }
     }
 
@@ -408,19 +453,20 @@ pub fn beta_reduce_once(root: &mut Node) -> ()
         {
             if child.token == Token::OpenParen
             {
-                beta_reduce_once(child.as_mut());
+                return beta_reduce_once(child.as_mut());
             }
             else if child.token == Token::Lambda
             {
-                beta_reduce_once(child.children[1].as_mut());
+                return beta_reduce_once(child.children[1].as_mut());
             }
         }
     }
+    return Err(());
 }
 
-fn replace(var: Token, arg: Box<Node>, body: &mut Node) -> () 
+fn replace(var: Box<Node>, arg: Box<Node>, body: &mut Node) -> () 
 {
-    if body.token == var
+    if *body == *var
     {
         *body = *(arg.clone());
     }
